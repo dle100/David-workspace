@@ -46,6 +46,8 @@ class EnrollDB:
         except mysql.connector.Error as err:  
             print(err)   
 
+    #Part 1: List all students in the database
+
     def listAllStudents(self):
         # """ Returns a String with all the students in the database.  
         #     Format:
@@ -68,30 +70,48 @@ class EnrollDB:
         cursor.close()
         return output
 
-#Question 1: List all students in the database
-    
+    #Part 2: List all professors in a department
+    def listDeptProfessors(self, deptName):
+        
+        # """Returns a String with all the professors in a given department name.
+        #    Format:
+        #             Professor Name, Department Name
+        #             Art Funk, Computer Science
+        #    Returns:
+        #             String containing professor information"""
+        output = "Professor Name, Deparment Name \n"
+        if (deptName != "None"):
+            query = f'SELECT pname, dname FROM prof WHERE dname = "{deptName}"'
+        else:
+            query = 'SELECT pname, dname FROM prof WHERE dname = "Null"'
+        print("Looking for all professors in " + deptName + "... \n")
+        
+        cursor = self.cnx.cursor()
+        cursor.execute(query)
 
-# def listDeptProfessors(self, deptName):
-#         """Returns a String with all the professors in a given department name.
-#            Format:
-#                     Professor Name, Department Name
-#                     Art Funk, Computer Science
-#            Returns:
-#                     String containing professor information"""
+        for (pname, dname) in cursor:
+            output = output + pname + ", " + dname + "\n"
+        cursor.close()
 
-#         # TODO: Execute query and build output string 
-#         return ""
+        return output
 
-#     def listCourseStudents(self, courseNum):
-#         """Returns a String with all students in a given course number (all sections).
-#             Format:
-#                 Student Id, Student Name, Course Number, Section Number
-#                 00005465, Joe Smith, COSC 304, 001
-#             Return:
-#                  String containing students"""
-
-#         # TODO: Execute query and build output string 
-#         return ""
+    #Part 3
+    def listCourseStudents(self, courseNum):
+        # """Returns a String with all students in a given course number (all sections).
+        #     Format:
+        #         Student Id, Student Name, Course Number, Section Number
+        #         00005465, Joe Smith, COSC 304, 001
+        #     Return:
+        #          String containing students"""
+        
+        output = "Student Id, Student Name, Course Number, Section Number \n"
+        query = f'SELECT student.sid, sname, enroll.cnum, enroll.secnum FROM student JOIN enroll ON enroll.sid=student.sid WHERE enroll.cnum = "{courseNum}"'
+        cursor = self.cnx.cursor()
+        cursor.execute(query)
+        for (sid, sname, cnum, secnum) in cursor:
+            output = output + f'{sid}, {sname}, {cnum}, {secnum}, \n'
+        cursor.close()
+        return output
 
 #     def computeGPA(self, studentId):
 #         """Returns a cursor with a row containing the computed GPA (named as gpa) for a given student id."""
@@ -174,42 +194,53 @@ class EnrollDB:
 
 
 # Do NOT change anything below here
-# def resultSetToString(self, cursor, maxrows):
-#         output = ""
-#         cols = cursor.column_names
-#         output += "Total columns: "+str(len(cols))+"\n"
-#         output += str(cols[0])
-#         for i in range(1,len(cols)):
-#             output += ", "+str(cols[i])
-#         for row in cursor:
-#             output += "\n"+str(row[0])
-#             for i in range(1,len(cols)):
-#                 output += ", "+str(row[i])
-#         output += "\nTotal results: "+str(cursor.rowcount)
-#         return output
+def resultSetToString(self, cursor, maxrows):
+        output = ""
+        cols = cursor.column_names
+        output += "Total columns: "+str(len(cols))+"\n"
+        output += str(cols[0])
+        for i in range(1,len(cols)):
+            output += ", "+str(cols[i])
+        for row in cursor:
+            output += "\n"+str(row[0])
+            for i in range(1,len(cols)):
+                output += ", "+str(row[i])
+        output += "\nTotal results: "+str(cursor.rowcount)
+        return output
 ###################################################################
 
 
 # Main execution for testing
+
 enrollDB = EnrollDB()
 enrollDB.connect()
-enrollDB.init()
+#Prevent rebuilding on each try of the code.
+#enrollDB.init()
 
+
+# #Question 1 Part 1:
 results = (enrollDB.listAllStudents())
 print(results)
 
-# print("Executing list professors in a department: Computer Science")
-# print(enrollDB.listDeptProfessors("Computer Science"))
-# print("Executing list professors in a department: none")
-# print(enrollDB.listDeptProfessors("none"))
+# #Question 1 Part 2:
+print("Executing list professors in a department: Computer Science")
+print(enrollDB.listDeptProfessors("Computer Science"))
+print("Executing list professors in a department: none")
+print(enrollDB.listDeptProfessors("none"))
 
-# print("Executing list students in course: COSC 304")
-# enrollDB.listCourseStudents("COSC 304")
-# print("Executing list students in course: DATA 301")
-# enrollDB.listCourseStudents("DATA 301")
+#Question 1 Part 3: 
+print("Executing list students in course: COSC 304")
+output = enrollDB.listCourseStudents("COSC 304")
+print(output)
 
-# print("Executing compute GPA for student: 45671234")
-# enrollDB.resultSetToString(enrollDB.computeGPA("45671234"),10)
+print("Executing list students in course: DATA 301")
+output = enrollDB.listCourseStudents("DATA 301")
+print(output)
+
+# Question 1 Part 4:
+
+#print("Executing compute GPA for student: 45671234")
+#enrollDB.resultSetToString(enrollDB.computeGPA("45671234"),10)
 # print("Executing compute GPA for student: 00000000")
 # enrollDB.resultSetToString(enrollDB.computeGPA("45671234"),10)
 
@@ -256,4 +287,4 @@ print(results)
 # print(enrollDB.resultSetToString(enrollDB.query3(), 100))
 # print(enrollDB.resultSetToString(enrollDB.query4(), 100))
         
-# enrollDB.close()
+enrollDB.close()
