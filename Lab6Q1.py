@@ -113,88 +113,109 @@ class EnrollDB:
         cursor.close()
         return output
 
-#     def computeGPA(self, studentId):
-#         """Returns a cursor with a row containing the computed GPA (named as gpa) for a given student id."""
-
-#         # TODO: Execute the query and return a cursor
-#         return None
-
-#     def addStudent(self, studentId, studentName, sex, birthDate):
-#         """Inserts a student into the databases."""
-
-#         # TODO: Execute statement. Make sure to commit
-#         return  
+    #Part 4
+    def computeGPA(self, studentId):
+        #"""Returns a cursor with a row containing the computed GPA (named as gpa) for a given student id."""
+        query = f'SELECT student.sid, student.gpa FROM student WHERE student.sid = "{studentId}"'
+        
+        cursor = self.cnx.cursor()
+        cursor.execute(query)
+        
+        # for (sid, avgGPA) in cursor:
+        #     output = output + f'{sid}, {sname}, {cnum}, {secnum}, \n'
+        # cursor.close()
+        
+        return cursor
     
-#     def deleteStudent(self, studentId):
-#         """Deletes a student from the databases."""
-
-#         # TODO: Execute statement. Make sure to commit
-#         return
-
-#     def updateStudent(self, studentId, studentName, sex, birthDate, gpa):
-#         """Updates a student in the databases."""
-
-#         # TODO: Execute statement. Make sure to commit
-#         return
+    #Part 5
+    def addStudent(self, studentId, studentName, sex, birthDate):
+       query =  f'INSERT INTO student (student.sid, sname, sex, birthdate) VALUES ("{studentId}",  "{studentName}", "{sex}", "{birthDate}")'
         
-#     def newEnroll(self, studentId, courseNum, sectionNum, grade):
-#         """Creates a new enrollment in a course section."""
+       cursor = self.cnx.cursor()
+       cursor.execute(query)
+       self.cnx.commit()
+    
+        #   # TODO: Execute statement. Make sure to commit
+       return 
         
-#         # TODO: Execute statement. Make sure to commit
-#         return
+    #Part 6
+    def deleteStudent(self, studentId):
+        #         """Deletes a student from the databases."""
 
-#     def updateStudentGPA(self, studentId):
-#         """ Updates a student's GPA based on courses taken."""
+        #         # TODO: Execute statement. Make sure to commit
+        #         return
+        query =  f'DELETE FROM student WHERE sid ="{studentId}"'
+        
+        cursor = self.cnx.cursor()
+        cursor.execute(query)
+        self.cnx.commit()
+        
+        #   # TODO: Execute statement. Make sure to commit
+        return 
 
-#         # TODO: Execute statement. Make sure to commit
-#         return
+    #     def updateStudent(self, studentId, studentName, sex, birthDate, gpa):
+    #         """Updates a student in the databases."""
 
-#     def removeStudentFromSection(self, studentId, courseNum, sectionNum):
-#         """Removes a student from a course and updates their GPA."""
+    #         # TODO: Execute statement. Make sure to commit
+    #         return
+            
+    #     def newEnroll(self, studentId, courseNum, sectionNum, grade):
+    #         """Creates a new enrollment in a course section."""
+            
+    #         # TODO: Execute statement. Make sure to commit
+    #         return
 
-#         # TODO: Execute statement. Make sure to commit
-#         return
+    #     def updateStudentGPA(self, studentId):
+    #         """ Updates a student's GPA based on courses taken."""
 
-#     def updateStudentMark(self, studentId, courseNum, sectionNum, grade):
-#         """Updates a student's mark in an enrolled course section and updates their grade."""
+    #         # TODO: Execute statement. Make sure to commit
+    #         return
 
-#         # TODO: Execute statement. Make sure to commit
-#         return
+    #     def removeStudentFromSection(self, studentId, courseNum, sectionNum):
+    #         """Removes a student from a course and updates their GPA."""
 
-#     def query1(self):
-#         """Return the list of students (id and name) that have not registered in any course section. Hint: Left join can be used instead of a subquery."""
+    #         # TODO: Execute statement. Make sure to commit
+    #         return
 
-#         # TODO: Execute the query and return a cursor
-#         return None
+    #     def updateStudentMark(self, studentId, courseNum, sectionNum, grade):
+    #         """Updates a student's mark in an enrolled course section and updates their grade."""
 
-#     def query2(self):
-#         """For each student return their id and name, number of course sections registered in (called numcourses), and gpa (average of grades). 
-#         Return only students born after March 15, 1992. A student is also only in the result if their gpa is above 3.1 or registered in 0 courses.
-#         Order by GPA descending then student name ascending and show only the top 5."""
+    #         # TODO: Execute statement. Make sure to commit
+    #         return
 
-#          # TODO: Execute the query and return a cursor
-#         return None
+    #     def query1(self):
+    #         """Return the list of students (id and name) that have not registered in any course section. Hint: Left join can be used instead of a subquery."""
 
-#     def query3(self):
-#         """For each course, return the number of sections (numsections), total number of students enrolled (numstudents), average grade (avggrade), and number of distinct professors who taught the course (numprofs).
-#             Only show courses in Chemistry or Computer Science department. Make sure to show courses even if they have no students. Do not show a course if there are no professors teaching that course. 
-#             Format:
-#             cnum, numsections, numstudents, avggrade, numprof"""
+    #         # TODO: Execute the query and return a cursor
+    #         return None
 
-#          # TODO: Execute the query and return a cursor
-#         return None
+    #     def query2(self):
+    #         """For each student return their id and name, number of course sections registered in (called numcourses), and gpa (average of grades). 
+    #         Return only students born after March 15, 1992. A student is also only in the result if their gpa is above 3.1 or registered in 0 courses.
+    #         Order by GPA descending then student name ascending and show only the top 5."""
 
-#     def query4(self):
-#         """Return the students who received a higher grade than their course section average in at least two courses. Order by number of courses higher than the average and only show top 5.
-#             Format:
-#             EmployeeId, EmployeeName, orderCount"""
+    #          # TODO: Execute the query and return a cursor
+    #         return None
 
-#         # TODO: Execute the query and return a cursor
-#         return None
+    #     def query3(self):
+    #         """For each course, return the number of sections (numsections), total number of students enrolled (numstudents), average grade (avggrade), and number of distinct professors who taught the course (numprofs).
+    #             Only show courses in Chemistry or Computer Science department. Make sure to show courses even if they have no students. Do not show a course if there are no professors teaching that course. 
+    #             Format:
+    #             cnum, numsections, numstudents, avggrade, numprof"""
 
+    #          # TODO: Execute the query and return a cursor
+    #         return None
 
-# Do NOT change anything below here
-def resultSetToString(self, cursor, maxrows):
+    #     def query4(self):
+    #         """Return the students who received a higher grade than their course section average in at least two courses. Order by number of courses higher than the average and only show top 5.
+    #             Format:
+    #             EmployeeId, EmployeeName, orderCount"""
+
+    #         # TODO: Execute the query and return a cursor
+    #         return None
+
+     # Do NOT change anything below here
+    def resultSetToString(self, cursor, maxrows):
         output = ""
         cols = cursor.column_names
         output += "Total columns: "+str(len(cols))+"\n"
@@ -207,15 +228,18 @@ def resultSetToString(self, cursor, maxrows):
                 output += ", "+str(row[i])
         output += "\nTotal results: "+str(cursor.rowcount)
         return output
-###################################################################
+    #################################################################
 
 
-# Main execution for testing
+
+
+
+    # Main execution for testing
 
 enrollDB = EnrollDB()
 enrollDB.connect()
 #Prevent rebuilding on each try of the code.
-#enrollDB.init()
+enrollDB.init()
 
 
 # #Question 1 Part 1:
@@ -238,35 +262,40 @@ output = enrollDB.listCourseStudents("DATA 301")
 print(output)
 
 # Question 1 Part 4:
+print("Executing compute GPA for student: 45671234")
+print(enrollDB.resultSetToString(enrollDB.computeGPA("45671234"),10))
 
-#print("Executing compute GPA for student: 45671234")
-#enrollDB.resultSetToString(enrollDB.computeGPA("45671234"),10)
-# print("Executing compute GPA for student: 00000000")
-# enrollDB.resultSetToString(enrollDB.computeGPA("45671234"),10)
+print("Executing compute GPA for student: 00000000")
+enrollDB.resultSetToString(enrollDB.computeGPA("45671234"),10)
 
-# print("Adding student 55555555:")
-# enrollDB.addStudent("55555555",  "Stacy Smith", "F", "1998-01-01")
-# print("Adding student 11223344:")
-# enrollDB.addStudent("11223344",  "Jim Jones", "M",  "1997-12-31")
-# print(enrollDB.listAllStudents())
+# Question 1 Part 5
+print("Adding student 55555555:")
+enrollDB.addStudent("55555555",  "Stacy Smith", "F", "1998-01-01")
+print("Adding student 11223344:")
+enrollDB.addStudent("11223344",  "Jim Jones", "M",  "1997-12-31")
+print(enrollDB.listAllStudents())
 
-# print("Test delete student:");
-# print("Deleting student 99999999:")
-# enrollDB.deleteStudent("99999999")
-# # Non-existing student
-# print("Deleting student 00000000:")
-# enrollDB.deleteStudent("00000000")
-# print(enrollDB.listAllStudents())
+#Question 1 Part 6
+print("Test delete student:");
+print("Deleting student 99999999:")
+enrollDB.deleteStudent("99999999")
+# Non-existing student
+print("Deleting student 00000000:")
+enrollDB.deleteStudent("00000000")
+print(enrollDB.listAllStudents())
 
+#Question 1 Part 7
 # print("Updating student 99999999:")
 # enrollDB.updateStudent("99999999",  "Wang Wong", "F", "1995-11-08", 3.23)
 # print("Updating student 00567454:")
 # enrollDB.updateStudent("00567454",  "Scott Brown", "M",  None, 4.00)
 # print(enrollDB.listAllStudents())
 
+#Question 1 part 8
 # print("Test new enrollment in COSC 304 for 98123434:")
 # enrollDB.newEnroll("98123434", "COSC 304", "001", 2.51)
 
+#Question 1 part 9
 # enrollDB.init()
 # print("Test update student GPA for student:")
 # enrollDB.newEnroll("98123434", "COSC 304", "001", 3.97);  
