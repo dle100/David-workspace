@@ -74,6 +74,7 @@ class EnrollDB:
                 output = output + str(sid) + ", " + sname + ", " + \
                     sex + ", " + str(birthdate) + ", " + str(gpa) + "\n"
             cursor.close()
+            print(cursor.rowcount, "record(s) affected")
             return output
         except mysql.connector.Error as err:
             print(err)
@@ -101,7 +102,7 @@ class EnrollDB:
             for (pname, dname) in cursor:
                 output = output + pname + ", " + dname + "\n"
             cursor.close()
-
+            print(cursor.rowcount, "record(s) affected")
             return output
         except mysql.connector.Error as err:
             print(err)
@@ -123,6 +124,7 @@ class EnrollDB:
             for (sid, sname, cnum, secnum) in cursor:
                 output = output + f'{sid}, {sname}, {cnum}, {secnum}, \n'
             cursor.close()
+            print(cursor.rowcount, "record(s) affected")
             return output
         except mysql.connector.Error as err:
             print(err)
@@ -131,15 +133,10 @@ class EnrollDB:
     def computeGPA(self, studentId):
         #"""Returns a cursor with a row containing the computed GPA (named as gpa) for a given student id."""
         query = f'SELECT student.sid, student.gpa FROM student WHERE student.sid = "{studentId}"'
-
         try:
             cursor = self.cnx.cursor()
             cursor.execute(query)
-
-            # for (sid, avgGPA) in cursor:
-            #     output = output + f'{sid}, {sname}, {cnum}, {secnum}, \n'
-            # cursor.close()
-
+            print(cursor.rowcount, "record(s) affected")
             return cursor
         except mysql.connector.Error as err:
             print(err)
@@ -147,54 +144,62 @@ class EnrollDB:
     # Part 5
     def addStudent(self, studentId, studentName, sex, birthDate):
         query = f'INSERT INTO student (student.sid, sname, sex, birthdate) VALUES ("{studentId}",  "{studentName}", "{sex}", "{birthDate}")'
-
         try:
             cursor = self.cnx.cursor()
             cursor.execute(query)
             self.cnx.commit()
-
-            #   # TODO: Execute statement. Make sure to commit
+            print(cursor.rowcount, "record(s) affected")
             return
         except mysql.connector.Error as err:
             print(err)
-    # Part 6
 
+    # Part 6: Delete Students
     def deleteStudent(self, studentId):
         #         """Deletes a student from the databases."""
-
-        #         # TODO: Execute statement. Make sure to commit
-        #         return
         query = f'DELETE FROM student WHERE sid ="{studentId}"'
 
         cursor = self.cnx.cursor()
         cursor.execute(query)
         self.cnx.commit()
-
-        #   # TODO: Execute statement. Make sure to commit
+        print(cursor.rowcount, "record(s) affected")
         return
 
     # Part 7: Update Student
     def updateStudent(self, studentId, studentName, sex, birthDate, gpa):
-        #         """Updates a student in the databases."""
-        query = f'ALTER TABLE Student SET sname = "{studentName}", sex = "{sex}", birthday = "{birthDate}", gpa = "{gpa}" WHERE sid = "{studentId}"'
-        cursor = self.cnx.cursor()
-        cursor.execute(query)
-        self.cnx.commit()
+        # Updates a student in the databases.
+        
+        if(str(birthDate) == "None"):
+            query = f'UPDATE student SET sname = "{studentName}", sex = "{sex}", birthdate = null, gpa = "{gpa}" WHERE sid = "{studentId}"'
+        else:
+            query = f'UPDATE student SET sname = "{studentName}", sex = "{sex}", birthdate = "{birthDate}", gpa = "{gpa}" WHERE sid = "{studentId}"'
+        
+        print(query)
+        try:
+            cursor = self.cnx.cursor()
+            cursor.execute(query)
+            self.cnx.commit()
+            print(cursor.rowcount, "record(s) affected")
+            return
+        except mysql.connector.Error as err:
+            print(err)
 
-    #         # TODO: Execute statement. Make sure to commit
-    #         return
+    
+    def newEnroll(self, studentId, courseNum, sectionNum, grade):
+        query = f'INSERT INTO enroll (sid, cnum, secnum, grade) VALUES ("{studentId}", "{courseNum}", "{sectionNum}", "{grade}")'
+        print(query)
+        try:
+            cursor = self.cnx.cursor()
+            cursor.execute(query)
+            self.cnx.commit()
+            print(cursor.rowcount, "record(s) affected")
+            return
+        except mysql.connector.Error as err:
+            print(err
 
-    #     def newEnroll(self, studentId, courseNum, sectionNum, grade):
-    #         """Creates a new enrollment in a course section."""
-
-    #         # TODO: Execute statement. Make sure to commit
-    #         return
-
-    #     def updateStudentGPA(self, studentId):
-    #         """ Updates a student's GPA based on courses taken."""
-
-    #         # TODO: Execute statement. Make sure to commit
-    #         return
+    # def updateStudentGPA(self, studentId):
+    # """ Updates a student's GPA based on courses taken."""
+    # # TODO: Execute statement. Make sure to commit
+    # return
 
     #     def removeStudentFromSection(self, studentId, courseNum, sectionNum):
     #         """Removes a student from a course and updates their GPA."""
@@ -253,20 +258,21 @@ class EnrollDB:
                 output += ", "+str(row[i])
         output += "\nTotal results: "+str(cursor.rowcount)
         return output
-    #################################################################
+#################################################################
 
-    # Main execution for testing
+
+# Main execution for testing
 enrollDB = EnrollDB()
 enrollDB.connect()
 # Prevent rebuilding on each try of the code.
 enrollDB.init()
 
 
-# #Question 1 Part 1:
+#Question 1 Part 1:
 results = (enrollDB.listAllStudents())
 print(results)
 
-# #Question 1 Part 2:
+#Question 1 Part 2:
 print("Executing list professors in a department: Computer Science")
 print(enrollDB.listDeptProfessors("Computer Science"))
 print("Executing list professors in a department: none")
@@ -277,7 +283,7 @@ print("Executing list students in course: COSC 304")
 output = enrollDB.listCourseStudents("COSC 304")
 print(output)
 
-print("Executing list students in course: DATA 301")
+# print("Executing list students in course: DATA 301")
 output = enrollDB.listCourseStudents("DATA 301")
 print(output)
 
@@ -293,7 +299,6 @@ print("Adding student 55555555:")
 enrollDB.addStudent("55555555",  "Stacy Smith", "F", "1998-01-01")
 print("Adding student 11223344:")
 enrollDB.addStudent("11223344",  "Jim Jones", "M",  "1997-12-31")
-print(enrollDB.listAllStudents())
 
 # Question 1 Part 6
 print("Test delete student:")
@@ -302,7 +307,7 @@ enrollDB.deleteStudent("99999999")
 # Non-existing student
 print("Deleting student 00000000:")
 enrollDB.deleteStudent("00000000")
-print(enrollDB.listAllStudents())
+
 
 # Question 1 Part 7
 print("Updating student 99999999:")
@@ -312,8 +317,8 @@ enrollDB.updateStudent("00567454",  "Scott Brown", "M",  None, 4.00)
 print(enrollDB.listAllStudents())
 
 # Question 1 part 8
-# print("Test new enrollment in COSC 304 for 98123434:")
-# enrollDB.newEnroll("98123434", "COSC 304", "001", 2.51)
+print("Test new enrollment in COSC 304 for 98123434:")
+enrollDB.newEnroll("98123434", "COSC 304", "001", 2.51)
 
 # Question 1 part 9
 # enrollDB.init()
