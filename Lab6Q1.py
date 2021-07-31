@@ -74,7 +74,6 @@ class EnrollDB:
                 output = output + str(sid) + ", " + sname + ", " + \
                     sex + ", " + str(birthdate) + ", " + str(gpa) + "\n"
             cursor.close()
-            print(cursor.rowcount, "record(s) affected")
             return output
         except mysql.connector.Error as err:
             print(err)
@@ -102,7 +101,6 @@ class EnrollDB:
             for (pname, dname) in cursor:
                 output = output + pname + ", " + dname + "\n"
             cursor.close()
-            print(cursor.rowcount, "record(s) affected")
             return output
         except mysql.connector.Error as err:
             print(err)
@@ -124,7 +122,6 @@ class EnrollDB:
             for (sid, sname, cnum, secnum) in cursor:
                 output = output + f'{sid}, {sname}, {cnum}, {secnum}, \n'
             cursor.close()
-            print(cursor.rowcount, "record(s) affected")
             return output
         except mysql.connector.Error as err:
             print(err)
@@ -183,7 +180,7 @@ class EnrollDB:
         except mysql.connector.Error as err:
             print(err)
 
-    
+    # Part 8: New Enrolment
     def newEnroll(self, studentId, courseNum, sectionNum, grade):
         query = f'INSERT INTO enroll (sid, cnum, secnum, grade) VALUES ("{studentId}", "{courseNum}", "{sectionNum}", "{grade}")'
         print(query)
@@ -194,9 +191,9 @@ class EnrollDB:
             print(cursor.rowcount, "record(s) affected")
             return
         except mysql.connector.Error as err:
-            print(err
+            print(err)
 
-    # def updateStudentGPA(self, studentId):
+    def updateStudentGPA(self, studentId):
     # """ Updates a student's GPA based on courses taken."""
     # # TODO: Execute statement. Make sure to commit
     # return
@@ -267,27 +264,30 @@ enrollDB.connect()
 # Prevent rebuilding on each try of the code.
 enrollDB.init()
 
-
 #Question 1 Part 1:
+print("\n ---------------------- Question 1 Part 1: ----------------------")
 results = (enrollDB.listAllStudents())
 print(results)
 
 #Question 1 Part 2:
+print("\n ---------------------- Question 1 Part 2: ----------------------")
 print("Executing list professors in a department: Computer Science")
 print(enrollDB.listDeptProfessors("Computer Science"))
 print("Executing list professors in a department: none")
 print(enrollDB.listDeptProfessors("none"))
 
 # Question 1 Part 3:
+print("\n ---------------------- Question 1 Part 3: ----------------------")
 print("Executing list students in course: COSC 304")
 output = enrollDB.listCourseStudents("COSC 304")
 print(output)
 
-# print("Executing list students in course: DATA 301")
+print("Executing list students in course: DATA 301")
 output = enrollDB.listCourseStudents("DATA 301")
 print(output)
 
 # Question 1 Part 4:
+print("\n ---------------------- Question 1 Part 4: ----------------------")
 print("Executing compute GPA for student: 45671234")
 print(enrollDB.resultSetToString(enrollDB.computeGPA("45671234"), 10))
 
@@ -295,12 +295,14 @@ print("Executing compute GPA for student: 00000000")
 enrollDB.resultSetToString(enrollDB.computeGPA("45671234"), 10)
 
 # Question 1 Part 5
+print("\n ---------------------- Question 1 Part 5: ----------------------")
 print("Adding student 55555555:")
 enrollDB.addStudent("55555555",  "Stacy Smith", "F", "1998-01-01")
 print("Adding student 11223344:")
 enrollDB.addStudent("11223344",  "Jim Jones", "M",  "1997-12-31")
 
 # Question 1 Part 6
+print("\n ---------------------- Question 1 Part 6: ----------------------")
 print("Test delete student:")
 print("Deleting student 99999999:")
 enrollDB.deleteStudent("99999999")
@@ -310,6 +312,7 @@ enrollDB.deleteStudent("00000000")
 
 
 # Question 1 Part 7
+print("\n ---------------------- Question 1 Part 7: ----------------------")
 print("Updating student 99999999:")
 enrollDB.updateStudent("99999999",  "Wang Wong", "F", "1995-11-08", 3.23)
 print("Updating student 00567454:")
@@ -317,20 +320,25 @@ enrollDB.updateStudent("00567454",  "Scott Brown", "M",  None, 4.00)
 print(enrollDB.listAllStudents())
 
 # Question 1 part 8
+print("\n ---------------------- Question 1 Part 8: ----------------------")
 print("Test new enrollment in COSC 304 for 98123434:")
 enrollDB.newEnroll("98123434", "COSC 304", "001", 2.51)
 
 # Question 1 part 9
+print("\n ---------------------- Question 1 Part 9: ----------------------")
+enrollDB.init()
+print("Test update student GPA for student:")
+enrollDB.newEnroll("98123434", "COSC 304", "001", 3.97)
+enrollDB.updateStudentGPA("98123434")
+
+# Question 1 part 10
+print("\n ---------------------- Question 1 Part 10: ----------------------")
+print("Test update student mark for student 98123434 to 3.55:")
+enrollDB.updateStudentMark("98123434", "COSC 304", "001", 3.55)
+
+# Question 1 part 11
+# print("\n ---------------------- Question 1 Part 11: ----------------------")
 # enrollDB.init()
-# print("Test update student GPA for student:")
-# enrollDB.newEnroll("98123434", "COSC 304", "001", 3.97);
-# enrollDB.updateStudentGPA("98123434")
-
-# print("Test update student mark for student 98123434 to 3.55:")
-# enrollDB.updateStudentMark("98123434", "COSC 304", "001", 3.55)
-
-# enrollDB.init()
-
 # enrollDB.removeStudentFromSection("00546343", "CHEM 113", "002")
 
 # # Queries
