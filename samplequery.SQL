@@ -80,7 +80,8 @@ SELECT enroll.sid, enroll.cnum, sname, enroll.grade FROM student JOIN enroll on 
 -- Merged:
 SELECT enroll.sid, enroll.cnum, sname, enroll.grade, e1.avggrade FROM student JOIN enroll on student.sid=enroll.sid JOIN (SELECT enroll.cnum, avg(enroll.grade) AS avggrade FROM enroll GROUP BY cnum) as e1 ON enroll.cnum=e1.cnum;
 
-
+-- Finally a comparator appears
+SELECT enroll.sid, enroll.cnum, sname, (enroll.grade > e1.avggrade) FROM student JOIN enroll on student.sid=enroll.sid JOIN (SELECT enroll.cnum, avg(enroll.grade) AS avggrade FROM enroll GROUP BY cnum) as e1 ON enroll.cnum=e1.cnum;
 SELECT sid, sname FROM student JOIN enroll on student.sid=enroll.sid WHERE enroll.grade > 
 SELECT sid, sname FROM student JOIN enroll on student.sid=enroll.sid WHERE count(enroll.grade > avg(enroll.grade))
 
@@ -90,4 +91,6 @@ SELECT e1.sid, student.sname, e1.grade, e2.avggrade FROM enroll as e1 JOIN stude
 
 (SELECT AVG(grade), enroll.cnum FROM enroll GROUP BY cnum)
 
-e2 WHERE e1.grade > AVG(e2.grade)
+e2 WHERE e1.grade > AVG(e2.grade);
+-- FINAL Query 4
+SELECT enroll.sid, sname, SUM (enroll.grade > e1.avggrade) as numhigher FROM student JOIN enroll on student.sid=enroll.sid JOIN (SELECT enroll.cnum, avg(enroll.grade) AS avggrade FROM enroll GROUP BY enroll.cnum) as e1 ON enroll.cnum=e1.cnum GROUP BY enroll.sid ORDER BY numhigher DESC;
