@@ -193,9 +193,9 @@ class EnrollDB:
         except mysql.connector.Error as err:
             print(err)
 
-    def updateStudentGPA(self, studentId):
-    # """ Updates a student's GPA based on courses taken."""
-    # # TODO: Execute statement. Make sure to commit
+    # def updateStudentGPA(self, studentId):
+    # # """ Updates a student's GPA based on courses taken."""
+    # # # TODO: Execute statement. Make sure to commit
     # return
 
     #     def removeStudentFromSection(self, studentId, courseNum, sectionNum):
