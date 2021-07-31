@@ -6,7 +6,6 @@ import import_ipynb
 import EnrollDB
 
 
-
 class TestEnrollDB(unittest.TestCase):
     def setUp(self):
         self.enrollDB = EnrollDB.EnrollDB()

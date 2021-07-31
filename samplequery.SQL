@@ -21,3 +21,8 @@ UPDATE student SET sname = "Wang Wong", sex = "F", birthdate = "1995-11-08", gpa
 enrollDB.newEnroll("98123434", "COSC 304", "001", 2.51)
 
 INSERT INTO enroll (sid, cnum, secnum, grade) VALUES ("98123434", "COSC 304", "001", 2.51)
+
+SELECT AVG(grade) FROM enroll WHERE sid = 98123434;
+SELECT AVG(grade) FROM enroll;
+SELECT sid, AVG(grade) as gpa FROM enroll;
+SELECT sid FROM enroll GROUP BY sid;
