@@ -268,13 +268,11 @@ class EnrollDB:
             print(err)
 
 
-#     def query2(self):
+    def query2(self):
 #         """For each student return their id and name, number of course sections registered in (called numcourses), and gpa (average of grades).
 #         Return only students born after March 15, 1992. A student is also only in the result if their gpa is above 3.1 or registered in 0 courses.
 #         Order by GPA descending then student name ascending and show only the top 5."""
-
-        query = 'SELECT student.sid, sname FROM student LEFT JOIN enroll ON student.sid=enroll.sid WHERE NOT student.sid IN (SELECT sid FROM enroll GROUP BY sid)'
-        
+        query = 'SELECT student.sid, sname, COUNT(enroll.cnum) as numcourses, AVG(enroll.grade) AS gpa FROM student LEFT JOIN enroll ON student.sid=enroll.sid WHERE (student.birthdate > "1992-03-15") GROUP BY student.sid HAVING ((gpa > 3.1) OR COUNT(enroll.cnum) =0) ORDER BY gpa DESC, sid ASC LIMIT 5;'
         try:
             cursor = self.cnx.cursor()
             cursor.execute(query)
@@ -282,13 +280,13 @@ class EnrollDB:
         except mysql.connector.Error as err:
             print(err)
 
-#     def query3(self):
+    def query3(self):
 #         """For each course, return the number of sections (numsections), total number of students enrolled (numstudents), average grade (avggrade), and number of distinct professors who taught the course (numprofs).
 #             Only show courses in Chemistry or Computer Science department. Make sure to show courses even if they have no students. Do not show a course if there are no professors teaching that course.
 #             Format:
 #             cnum, numsections, numstudents, avggrade, numprof"""
 
-        query = 'SELECT student.sid, sname FROM student LEFT JOIN enroll ON student.sid=enroll.sid WHERE NOT student.sid IN (SELECT sid FROM enroll GROUP BY sid)'
+        query = 'SELECT enroll.cnum, COUNT(DISTINCT enroll.secnum) AS numsections, COUNT(enroll.sid) AS numstudents, AVG(enroll.grade) AS avggrade FROM enroll GROUP BY enroll.cnum;'
         
         try:
             cursor = self.cnx.cursor()
@@ -297,13 +295,22 @@ class EnrollDB:
         except mysql.connector.Error as err:
             print(err)
 
-#     def query4(self):
+    def query4(self):
 #         """Return the students who received a higher grade than their course section average in at least two courses. Order by number of courses higher than the average and only show top 5.
 #             Format:
 #             EmployeeId, EmployeeName, orderCount"""
 
         query = 'SELECT student.sid, sname FROM student LEFT JOIN enroll ON student.sid=enroll.sid WHERE NOT student.sid IN (SELECT sid FROM enroll GROUP BY sid)'
         
+        # "Total columns: 3"
+        # 				+"\nsid, sname, numhigher"
+        # 				+"\n00324534, Tony Tenson, 10"
+        # 				+"\n00112233, Trisha Cavanugh, 9"
+        # 				+"\n00612354, Elizabeth Guillum, 8"
+        # 				+"\n55980348, Brian Brooks, 7"
+        # 				+"\n99234353, Jamie Stokes, 7"
+        # 				+"\nTotal results: 5"
+
         try:
             cursor = self.cnx.cursor()
             cursor.execute(query)
@@ -332,7 +339,7 @@ class EnrollDB:
 enrollDB = EnrollDB()
 enrollDB.connect()
 # Prevent rebuilding on each try of the code.
-#enrollDB.init()
+# enrollDB.init()
 
 # # #Question 1 Part 1:
 # # print("\n ---------------------- Question 1 Part 1: ----------------------")
@@ -414,10 +421,18 @@ enrollDB.connect()
 
 # Queries
 # Re-initialize all data
-# enrollDB.init()
+
+#enrollDB.init()
+print("\n ---------------------- Question 1 Query 1: ----------------------")
 print(enrollDB.resultSetToString(enrollDB.query1(), 100))
-# print(enrollDB.resultSetToString(enrollDB.query2(), 100))
-# print(enrollDB.resultSetToString(enrollDB.query3(), 100))
-# print(enrollDB.resultSetToString(enrollDB.query4(), 100))
+
+print("\n ---------------------- Question 1 Query 2: ----------------------")
+print(enrollDB.resultSetToString(enrollDB.query2(), 100))
+
+print("\n ---------------------- Question 1 Query 3: ----------------------")
+print(enrollDB.resultSetToString(enrollDB.query3(), 100))
+
+
+print(enrollDB.resultSetToString(enrollDB.query4(), 100))
 
 enrollDB.close()
