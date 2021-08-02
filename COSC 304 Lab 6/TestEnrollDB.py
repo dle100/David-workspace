@@ -2,7 +2,7 @@
 import unittest
 # Note: If using Jupyter Notebook may need to use special package to import notebooks
 # pip install import_ipnyb
-import import_ipynb
+#import import_ipynb
 import EnrollDB
 
 
@@ -10,7 +10,7 @@ class TestEnrollDB(unittest.TestCase):
     def setUp(self):
         self.enrollDB = EnrollDB.EnrollDB()
         self.enrollDB.con = self.enrollDB.connect()
-        self.enrollDB.init()
+        # self.enrollDB.init()
         
     def tearDown(self):
         self.enrollDB.close()
@@ -87,7 +87,7 @@ class TestEnrollDB(unittest.TestCase):
         """Tests listing all students in course"""
     
         # Re-initialize database
-        self.enrollDB.init()
+        # self.enrollDB.init()
         
         print("\nTest list students in course: COSC 304.\n")
         
@@ -122,7 +122,7 @@ class TestEnrollDB(unittest.TestCase):
         """Tests computing GPA for student"""
     
         # Re-initialize database
-        self.enrollDB.init()
+        #self.enrollDB.init()
         
         print("\nTest compute GPA for student: 45671234.\n")
         
@@ -376,7 +376,7 @@ class TestEnrollDB(unittest.TestCase):
     def testQuery1(self):
 
         # Re-initialize database
-        self.enrollDB.init()
+        # self.enrollDB.init()
         
         print("\nTest query 1:\n")
         
@@ -392,12 +392,12 @@ class TestEnrollDB(unittest.TestCase):
         queryResult = self.enrollDB.resultSetToString(cursor, 100)
         print(queryResult)
         self.assertEqual(answer, queryResult)
-    
+     
     def testQuery2(self):
         
          
         # Re-initialize database
-        self.enrollDB.init()
+        #self.enrollDB.init()
         
         print("\nTest query 2:\n")
         

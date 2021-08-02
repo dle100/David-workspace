@@ -5,8 +5,7 @@
 import mysql.connector
 import unittest
 
-# EnrollDB is the Application
-
+# EnrollDB is the Application Name
 
 class EnrollDB:
     """Application for an enrollment database on MySQL"""
@@ -62,18 +61,15 @@ class EnrollDB:
         #         String containing all student information"""
 
         query = "SELECT sid, sname, sex, birthdate, gpa FROM student"
-
         print("Executing list all students.")
-
-        # TODO: Execute query and build output string
         try:
             cursor = self.cnx.cursor()
-            output = "sid, sname, sex, birthdate, gpa \n"
+            output = "sid, sname, sex, birthdate, gpa"
             cursor.execute(query)
 
             for (sid, sname, sex, birthdate, gpa) in cursor:
-                output = output + str(sid) + ", " + sname + ", " + \
-                    sex + ", " + str(birthdate) + ", " + str(gpa) + "\n"
+                output = output + "\n" + str(sid) + ", " + sname + ", " + \
+                    sex + ", " + str(birthdate) + ", " + str(gpa) 
             cursor.close()
             return output
         except mysql.connector.Error as err:
@@ -89,18 +85,18 @@ class EnrollDB:
         #    Returns:
         #             String containing professor information"""
         try:
-            output = "Professor Name, Deparment Name \n"
-            if (deptName != "None"):
+            output = "Professor Name, Department Name"
+            if (deptName != "none" or deptName != "None"):
                 query = f'SELECT pname, dname FROM prof WHERE dname = "{deptName}"'
             else:
-                query = 'SELECT pname, dname FROM prof WHERE dname = "Null"'
+                query = 'SELECT pname, dname FROM prof WHERE dname = Null'
             print("Looking for all professors in " + deptName + "... \n")
 
             cursor = self.cnx.cursor()
             cursor.execute(query)
 
             for (pname, dname) in cursor:
-                output = output + pname + ", " + dname + "\n"
+                output = output + "\n" + pname + ", " + dname
             cursor.close()
             return output
         except mysql.connector.Error as err:
@@ -116,13 +112,14 @@ class EnrollDB:
         #          String containing students"""
 
         try:
-            output = "Student Id, Student Name, Course Number, Section Number \n"
+            output = "Student Id, Student Name, Course Number, Section Number"
             query = f'SELECT student.sid, sname, enroll.cnum, enroll.secnum FROM student JOIN enroll ON enroll.sid=student.sid WHERE enroll.cnum = "{courseNum}"'
             cursor = self.cnx.cursor()
             cursor.execute(query)
             for (sid, sname, cnum, secnum) in cursor:
-                output = output + f'{sid}, {sname}, {cnum}, {secnum}, \n'
+                output = output + f'\n{sid}, {sname}, {cnum}, {secnum}'
             cursor.close()
+            print(output)
             return output
         except mysql.connector.Error as err:
             print(err)
@@ -130,7 +127,7 @@ class EnrollDB:
     # Part 4
     def computeGPA(self, studentId):
         # """Returns a cursor with a row containing the computed GPA (named as gpa) for a given student id."""
-        query = f'SELECT student.sid, student.gpa FROM student WHERE student.sid = "{studentId}"'
+        query = f'SELECT AVG(grade) as gpa FROM enroll WHERE sid = "{studentId}"'
         try:
             cursor = self.cnx.cursor()
             cursor.execute(query)
@@ -185,8 +182,14 @@ class EnrollDB:
 
     # Part 8: New Enrolment
     def newEnroll(self, studentId, courseNum, sectionNum, grade):
+        
         query = f'INSERT INTO enroll (sid, cnum, secnum, grade) VALUES ("{studentId}", "{courseNum}", "{sectionNum}", "{grade}")'
+        
+        if(grade == None):
+            query = f'INSERT INTO enroll (sid, cnum, secnum) VALUES ("{studentId}", "{courseNum}", "{sectionNum}")'
+                
         print(query)
+
         try:
             cursor = self.cnx.cursor()
             cursor.execute(query)
@@ -272,7 +275,7 @@ class EnrollDB:
 #         """For each student return their id and name, number of course sections registered in (called numcourses), and gpa (average of grades).
 #         Return only students born after March 15, 1992. A student is also only in the result if their gpa is above 3.1 or registered in 0 courses.
 #         Order by GPA descending then student name ascending and show only the top 5."""
-        query = 'SELECT student.sid, sname, COUNT(enroll.cnum) as numcourses, AVG(enroll.grade) AS gpa FROM student LEFT JOIN enroll ON student.sid=enroll.sid WHERE (student.birthdate > "1992-03-15") GROUP BY student.sid HAVING ((gpa > 3.1) OR COUNT(enroll.cnum) =0) ORDER BY gpa DESC, sid ASC LIMIT 5;'
+        query = 'SELECT student.sid, sname, COUNT(enroll.cnum) as numcourses, AVG(enroll.grade) AS gpa FROM student LEFT JOIN enroll ON student.sid=enroll.sid WHERE (student.birthdate > "1992-03-15") GROUP BY student.sid HAVING ((gpa > 3.1) OR COUNT(enroll.cnum) = 0 OR COUNT(enroll.cnum) IS NULL) ORDER BY gpa DESC, sname ASC LIMIT 5;'
         try:
             cursor = self.cnx.cursor()
             cursor.execute(query)
@@ -286,7 +289,7 @@ class EnrollDB:
 #             Format:
 #             cnum, numsections, numstudents, avggrade, numprof"""
 
-        query = 'SELECT enroll.cnum, COUNT(DISTINCT enroll.secnum) AS numsections, COUNT(enroll.sid) AS numstudents, AVG(enroll.grade) AS avggrade FROM enroll GROUP BY enroll.cnum;'
+        query = 'SELECT DISTINCT section.cnum, count(section.secnum) as numsections, numstudents, avggrade, COUNT(DISTINCT section.pname) as numprofs FROM section LEFT JOIN (SELECT enroll.cnum, COUNT(enroll.sid) AS numstudents, AVG(enroll.grade) AS avggrade FROM enroll GROUP BY cnum) as marks ON marks.cnum = section.cnum WHERE section.cnum LIKE "%CHEM%" OR section.cnum LIKE "%COSC%" GROUP BY section.cnum HAVING numprofs > 0 ORDER BY cnum asc;'
         
         try:
             cursor = self.cnx.cursor()
@@ -300,7 +303,7 @@ class EnrollDB:
 #             Format:
 #             EmployeeId, EmployeeName, orderCount"""
 
-        query = """SELECT enroll.sid, sname, SUM (enroll.grade > e1.avggrade) as numhigher FROM student JOIN enroll on student.sid=enroll.sid JOIN (SELECT enroll.cnum, avg(enroll.grade) AS avggrade FROM enroll GROUP BY enroll.cnum) as e1 ON enroll.cnum=e1.cnum GROUP BY enroll.sid ORDER BY numhigher DESC;"""
+        query = 'SELECT enroll.sid, sname, SUM(enroll.grade > e1.avggrade) as numhigher FROM student, enroll, (SELECT enroll.cnum, enroll.secnum, avg(enroll.grade) AS avggrade FROM enroll GROUP BY enroll.secnum, enroll.cnum) as e1 WHERE student.sid=enroll.sid AND enroll.cnum=e1.cnum AND enroll.secnum=e1.secnum GROUP BY enroll.sid HAVING numhigher > 1 ORDER BY numhigher DESC, sname ASC LIMIT 5;'
         
         try:
             cursor = self.cnx.cursor()
@@ -326,26 +329,23 @@ class EnrollDB:
 #################################################################
 
 
-# Main execution for testing
-enrollDB = EnrollDB()
-enrollDB.connect()
-# Prevent rebuilding on each try of the code.
-# enrollDB.init()
+# # Main execution for testing
+# enrollDB = EnrollDB()
+# enrollDB.connect()
 
-# #Question 1 Part 1:
-# print("\n ---------------------- Question 1 Part 1: ----------------------")
+# # # Prevent rebuilding on each try of the code.
+# enrollDB.init()
+# # #Question 1 Part 1:
 # results = (enrollDB.listAllStudents())
 # print(results)
 
-# #Question 1 Part 2:
-# print("\n ---------------------- Question 1 Part 2: ----------------------")
+# # #Question 1 Part 2:
 # print("Executing list professors in a department: Computer Science")
 # print(enrollDB.listDeptProfessors("Computer Science"))
 # print("Executing list professors in a department: none")
 # print(enrollDB.listDeptProfessors("none"))
 
 # # Question 1 Part 3:
-# print("\n ---------------------- Question 1 Part 3: ----------------------")
 # print("Executing list students in course: COSC 304")
 # output = enrollDB.listCourseStudents("COSC 304")
 # print(output)
@@ -355,7 +355,6 @@ enrollDB.connect()
 # print(output)
 
 # # Question 1 Part 4:
-# print("\n ---------------------- Question 1 Part 4: ----------------------")
 # print("Executing compute GPA for student: 45671234")
 # print(enrollDB.resultSetToString(enrollDB.computeGPA("45671234"), 10))
 
@@ -363,7 +362,6 @@ enrollDB.connect()
 # enrollDB.resultSetToString(enrollDB.computeGPA("45671234"), 10)
 
 # # Question 1 Part 5
-# print("\n ---------------------- Question 1 Part 5: ----------------------")
 # enrollDB.init()
 # print("Adding student 55555555:")
 # enrollDB.addStudent("55555555",  "Stacy Smith", "F", "1998-01-01")
@@ -371,7 +369,6 @@ enrollDB.connect()
 # enrollDB.addStudent("11223344",  "Jim Jones", "M",  "1997-12-31")
 
 # # Question 1 Part 6
-# print("\n ---------------------- Question 1 Part 6: ----------------------")
 # enrollDB.init()
 # print("Test delete student:")
 # print("Deleting student 99999999:")
@@ -382,7 +379,6 @@ enrollDB.connect()
 
 
 # # Question 1 Part 7
-# print("\n ---------------------- Question 1 Part 7: ----------------------")
 # enrollDB.init()
 # print("Updating student 99999999:")
 # enrollDB.updateStudent("99999999",  "Wang Wong", "F", "1995-11-08", 3.23)
@@ -390,43 +386,35 @@ enrollDB.connect()
 # enrollDB.updateStudent("00567454",  "Scott Brown", "M",  None, 4.00)
 
 # # Question 1 part 8
-# print("\n ---------------------- Question 1 Part 8: ----------------------")
 # enrollDB.init()
 # print("Test new enrollment in COSC 304 for 98123434:")
 # # Add an enroll with a student
 # enrollDB.newEnroll("98123434", "COSC 304", "001", 2.51)
 
 # # Question 1 part 9
-# print("\n ---------------------- Question 1 Part 9: ----------------------")
 # enrollDB.init()
 # print("Test update student GPA for student:")
 # enrollDB.newEnroll("98123434", "COSC 304", "001", 3.97)
 # enrollDB.updateStudentGPA("98123434")
 
 # # Question 1 part 10
-# print("\n ---------------------- Question 1 Part 10: ----------------------")
 # print("Test update student mark for student 98123434 to 3.55:")
 # enrollDB.updateStudentMark("98123434", "COSC 304", "001", 3.55)
 
 # # Question 1 part 11
-# print("\n ---------------------- Question 1 Part 11: ----------------------")
 # enrollDB.init()
 # enrollDB.removeStudentFromSection("00546343", "CHEM 113", "002")
 
-# Queries
-# Re-initialize all data
+# # Queries
+# # Re-initialize all data
 
-#enrollDB.init()
-# print("\n ---------------------- Question 1 Query 1: ----------------------")
+# enrollDB.init()
 # print(enrollDB.resultSetToString(enrollDB.query1(), 100))
 
-# print("\n ---------------------- Question 1 Query 2: ----------------------")
 # print(enrollDB.resultSetToString(enrollDB.query2(), 100))
 
-# print("\n ---------------------- Question 1 Query 3: ----------------------")
 # print(enrollDB.resultSetToString(enrollDB.query3(), 100))
 
-print("\n ---------------------- Question 1 Query 4: ----------------------")
-print(enrollDB.resultSetToString(enrollDB.query4(), 100))
+# print(enrollDB.resultSetToString(enrollDB.query4(), 100))
 
-enrollDB.close()
+# enrollDB.close()

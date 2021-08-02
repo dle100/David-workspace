@@ -1,0 +1,11 @@
+
+========= Query 3 =========
+For each course, return the number of sections (numsections), total number of students enrolled (numstudents), average grade (avggrade), and number of distinct professors who taught the course (numprofs).
+
+SELECT cnum, COUNT(DISTINCT secnum) as numsections, (COUNT(DISTINCT SID)) as numstudents, AVG(grade) as avggrade from enroll GROUP BY cnum
+
+Only show courses in Chemistry or Computer Science department. Make sure to show courses even if they have no students. Do not show a course if there are no professors teaching that course.
+wh
+Format:
+cnum, numsections, numstudents, avggrade, numprof
+
